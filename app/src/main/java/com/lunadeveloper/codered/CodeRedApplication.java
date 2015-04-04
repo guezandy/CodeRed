@@ -11,6 +11,7 @@ import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -61,10 +62,7 @@ public class CodeRedApplication extends Application {
          * Parse credentials and initialize
          */
         Parse.initialize(this, "BrlF80YJ7tEhkrZ4pX2XjkRxGsuHEKU0yBppFrrO", "TRMjDXZaLJw5DaWM3Ma8rmZgRCONTxNzlke71Ylh");
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-                //        ParseFacebookUtils.initialize(getString(R.string.facebook_app_id));
+        ParseFacebookUtils.initialize(getString(R.string.facebook_app_id));
 
         /*
          * This app lets an anonymous user create and save photos of meals

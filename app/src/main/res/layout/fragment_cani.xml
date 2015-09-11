@@ -1,0 +1,42 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mapbox="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/background">
+
+    <TextView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:id="@+id/currentDate"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:text="Current date"
+        android:textColor="@color/white"
+        android:textSize="50sp"
+        android:layout_above="@+id/imageView" />
+
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:src="@drawable/canigoout_button"
+        android:id="@+id/imageView"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center" />
+
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/next"
+        android:id="@+id/next"
+        android:layout_toRightOf="@+id/imageView"/>
+    <ImageView
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        android:src="@drawable/previous"
+        android:id="@+id/prev"
+        android:layout_toLeftOf="@+id/imageView"/>
+</RelativeLayout>

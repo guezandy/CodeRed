@@ -1,11 +1,16 @@
 package com.lunadeveloper.codered;
 
 import android.app.Application;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.CalendarContract;
 import android.util.Log;
 
 
+import com.lunadeveloper.codered.model.ParseEventModel;
 import com.lunadeveloper.codered.model.ParseUserModel;
 import com.parse.GetCallback;
 import com.parse.Parse;
@@ -39,6 +44,7 @@ public class CodeRedApplication extends Application {
 
     private static SharedPreferences preferences;
 
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -49,6 +55,7 @@ public class CodeRedApplication extends Application {
          *
          */
         ParseObject.registerSubclass(ParseUserModel.class);
+        ParseObject.registerSubclass(ParseEventModel.class);
 
 
         preferences = getSharedPreferences("com.lunadeveloper.codered", Context.MODE_PRIVATE);

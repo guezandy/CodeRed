@@ -86,13 +86,18 @@
     <orderEntry type="jdk" jdkName="Android API 21 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="appcompat-v7-21.0.3" level="project" />
+    <orderEntry type="library" exported="" name="hirondelle-date4j-1.5.1" level="project" />
     <orderEntry type="library" exported="" name="aws-android-sdk-2.1.7-s3" level="project" />
     <orderEntry type="library" exported="" name="Parse-1.7.0" level="project" />
+    <orderEntry type="library" exported="" name="google-api-services-calendar-v3-rev121-1.20.0-sources" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="bolts-android-1.1.2" level="project" />
+    <orderEntry type="library" exported="" name="google-api-services-calendar-v3-rev121-1.20.0" level="project" />
+    <orderEntry type="library" exported="" name="google-api-services-calendar-v3-rev121-1.20.0-javadoc" level="project" />
     <orderEntry type="library" exported="" name="aws-android-sdk-2.1.7-core" level="project" />
     <orderEntry type="module" module-name="facebook" exported="" />
+    <orderEntry type="module" module-name="caldroid" exported="" />
   </component>
 </module>
 

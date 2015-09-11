@@ -6,5 +6,13 @@
     <color name="white">#ffffff</color>
     <color name="blue">#36B0F3</color>
     <color name="grey_dark_semi_transparent">#ff666666</color>
-
+    <color name="title_background">#ff355689</color>
+    <color name="title_text">#ffffffff</color>
+    <color name="title_separator">#40ffffff</color>
+    <color name="drawer">#221D2E</color>
+    <color name="background">#150834</color>
+    <color name="nav">#44395D</color>
+    <color name="green">#02D07E</color>
+    <color name="red">#FC403F</color>
+    <color name="light_blue">#89FFFF</color>
 </resources>

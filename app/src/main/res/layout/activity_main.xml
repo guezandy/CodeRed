@@ -1,13 +1,75 @@
 <!-- A DrawerLayout is intended to be used as the top-level content view using match_parent for both width and height to consume the full space available. -->
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:id="@+id/drawer_layout"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    tools:context=".MainActivity">
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.lunadeveloper.codered.MainActivity">
 
-    <!-- As the main content view, the view below consumes the entire
-         space available using match_parent in both dimensions. -->
-    <FrameLayout android:id="@+id/container" android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <com.lunadeveloper.codered.ui.SlidingUpPanelLayout
+        xmlns:fylm001="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        fylm001:panelHeight="68dp"
+        fylm001:shadowHeight="4dp"
+        fylm001:paralaxOffset="100dp"
+        fylm001:dragView="@+id/dragView">
+
+        <!-- MAIN CONTENT -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.Toolbar
+                xmlns:sothree="http://schemas.android.com/apk/res-auto"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/main_toolbar"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                sothree:theme="@style/ActionBar"
+                android:layout_width="match_parent"/>
+            <!-- As the main content view, the view below consumes the entire
+                 space available using match_parent in both dimensions. -->
+            <FrameLayout
+                android:id="@+id/container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </FrameLayout>
+
+        <!-- SLIDING LAYOUT -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#eeeeee"
+            android:orientation="vertical"
+            android:clickable="true"
+            android:focusable="false"
+            android:id="@+id/dragView">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="68dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/container2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/container3"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:scaleType="fitStart"
+                android:src="@mipmap/ic_launcher" />
+        </LinearLayout>
+    </com.lunadeveloper.codered.ui.SlidingUpPanelLayout>
 
     <!-- android:layout_gravity="start" tells DrawerLayout to treat
          this as a sliding drawer on the left side for left-to-right
@@ -17,7 +79,8 @@
     <!-- The drawer is given a fixed width in dp and extends the full height of
          the container. -->
     <fragment android:id="@+id/navigation_drawer"
-        android:layout_width="@dimen/navigation_drawer_width" android:layout_height="match_parent"
+        android:layout_width="@dimen/navigation_drawer_width"
+        android:layout_height="match_parent"
         android:layout_gravity="start"
         android:name="com.lunadeveloper.codered.NavigationDrawerFragment"
         tools:layout="@layout/fragment_navigation_drawer" />

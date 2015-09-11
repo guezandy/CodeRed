@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.lunadeveloper.codered.login.ParseLoginDispatchActivity;
+import com.lunadeveloper.codered.model.ParseEventModel;
 import com.lunadeveloper.codered.model.ParseUserModel;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -13,8 +14,14 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -109,4 +116,58 @@ public class ParseService {
         });
 
     }*/
+
+    public void getEvents(final IParseCallback<List<ParseEventModel>> eventsCallback) {
+
+        ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.findInBackground(new FindCallback<ParseEventModel>() {
+            @Override
+            public void done(List<ParseEventModel> results, ParseException e) {
+                if (e != null) {
+                    // There was an error
+                } else {
+                    //add results to the callback
+                    eventsCallback.onSuccess(results);
+                }
+            }
+        });
+    }
+
+    public void checkDate(final String string, final IParseCallback<List<ParseEventModel>> eventsCallback) {
+
+        //String string = "January 2, 2010";
+        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format.parse(string);
+        } catch (java.text.ParseException i) {
+            Log.e("GET TOMORROW", "GOT EXCEPTION");
+        }
+        System.out.println(date); // Sat Jan 02 00:00:00 GMT 2010
+
+
+        ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
+        query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.whereEqualTo("start_date", string);
+        query.findInBackground(new FindCallback<ParseEventModel>() {
+            @Override
+            public void done(List<ParseEventModel> results, ParseException e) {
+                if (e != null) {
+                    // There was an error
+                } else {
+                    //add results to the callback
+                    eventsCallback.onSuccess(results);
+                }
+            }
+        });
+    }
+
+    public static String getDateAndTime(long milliSeconds) {
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "dd/MM/yyyy hh:mm:ss a");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
 }

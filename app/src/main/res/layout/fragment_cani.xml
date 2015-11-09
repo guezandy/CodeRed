@@ -6,17 +6,14 @@
     android:background="@color/background">
 
     <TextView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:id="@+id/currentDate"
         android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:gravity="center"
         android:text="Current date"
         android:textColor="@color/white"
-        android:textSize="50sp"
+        android:textSize="12sp"
         android:layout_above="@+id/imageView" />
 
     <ImageView
@@ -33,10 +30,24 @@
         android:src="@drawable/next"
         android:id="@+id/next"
         android:layout_toRightOf="@+id/imageView"/>
+
     <ImageView
         android:layout_width="250dp"
         android:layout_height="match_parent"
         android:src="@drawable/previous"
         android:id="@+id/prev"
         android:layout_toLeftOf="@+id/imageView"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/result"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/imageView"
+        android:gravity="center"
+        android:text="The Result"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:layout_above="@+id/imageView" />
 </RelativeLayout>

@@ -29,7 +29,6 @@ import java.util.Locale;
  * <p/>
  * Note: This class does not spawn new Threads.
  * <p/>
- * Created by benjamin on 9/19/14.
  */
 public class ParseService {
     private final String TAG = ParseService.class.getSimpleName();
@@ -53,6 +52,7 @@ public class ParseService {
         user.setUsername(registerDetails.get(0));
         user.setPassword(registerDetails.get(1));
         user.setFullName(registerDetails.get(2));
+        user.setEarly(registerDetails.get(3));
 
         user.signUpInBackground(new SignUpCallback() {
             @Override
@@ -77,50 +77,18 @@ public class ParseService {
         });
     }
 
-    /*public void getVideoPerUser(final Context context, final IParseCallback<List<ParseVideoModel>> itemsCallback) {
-
-        ParseQuery<ParseVideoModel> query = ParseQuery.getQuery("ParseVideoModel");
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
-        //query.whereEqualTo("store", store);
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<ParseVideoModel>() {
-            @Override
-            public void done(List<ParseVideoModel> results, ParseException e) {
-                if (e != null) {
-                    // There was an error
-                } else {
-                    //add results to the callback
-                    itemsCallback.onSuccess(results);
-                }
-            }
-        });
-
-    }
-
-    public void getVideoPerAudience(final Context context, final String audienceId, final IParseCallback<List<ParseVideoModel>> itemsCallback) {
-
-        ParseQuery<ParseVideoModel> query = ParseQuery.getQuery("ParseVideoModel");
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
-        //query.whereEqualTo("store", store);
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<ParseVideoModel>() {
-            @Override
-            public void done(List<ParseVideoModel> results, ParseException e) {
-                if (e != null) {
-                    // There was an error
-                } else {
-                    //add results to the callback
-                    itemsCallback.onSuccess(results);
-                }
-            }
-        });
-
-    }*/
 
     public void getEvents(final IParseCallback<List<ParseEventModel>> eventsCallback) {
 
+
+        //get tomorrows date as string to compare to and get in query
+
+
+        Date now = new Date();
+        System.out.println("PS: Tomorrow: " + showTomorrowsDate(now.getTime()));
         ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
         query.whereEqualTo("user", ParseUser.getCurrentUser());
+        query.whereEqualTo("start_date", showTomorrowsDate(now.getTime()));
         query.findInBackground(new FindCallback<ParseEventModel>() {
             @Override
             public void done(List<ParseEventModel> results, ParseException e) {
@@ -166,6 +134,16 @@ public class ParseService {
     public static String getDateAndTime(long milliSeconds) {
         SimpleDateFormat formatter = new SimpleDateFormat(
                 "dd/MM/yyyy hh:mm:ss a");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
+
+
+    public static String showTomorrowsDate(long milliSeconds) {
+        milliSeconds = milliSeconds + 86400000;
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "dd/MM/yyyy");
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());

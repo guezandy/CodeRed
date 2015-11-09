@@ -53,6 +53,15 @@ public class ParseEventModel extends ParseObject {
     public Boolean getDayOff() {
         return this.getBoolean("dayoff");
     }
+
+    public void setTooEarly(Boolean early) {
+        this.put("tooEarly", early);
+    }
+
+    public Boolean getTooEarly() {
+        return this.getBoolean("tooEarly");
+    }
+
     //parse user
     public void setUser() {
         this.put("user", ParseUser.getCurrentUser());

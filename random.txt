@@ -1,0 +1,87 @@
+                            //System.out.println("PArse: "+item.getStartTime());
+                            DateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss a", Locale.ENGLISH);
+                            Date date = null;
+                            try {
+                                date = format.parse(item.getStartTime());
+                                //System.out.println("DATE: "+date);
+                            } catch (java.text.ParseException i) {
+                                Log.e("GET TOMORROW", "GOT EXCEPTION");
+                            }
+                            //System.out.println("SEC: "+date.getTime()); // Sat Jan 02 00:00:00 GMT 2010
+                            //System.out.println("DATEcomp: "+showDate(date.getTime()));
+                            Date now = new Date();
+                            //System.out.println("Tomorrow: "+showCurrentTomorrowDate(now.getTime(), count));
+                            if(showDate(date.getTime()).equals(showCurrentTomorrowDate(now.getTime(), count))) {
+                                 System.out.println("THEY THIS IS HAPPENING TOMORROW ARE EQUAL");
+
+
+                                //if tomorrow is not a day off and its too early
+                                if(!item.getDayOff() && item.getTooEarly()) {
+                                    System.out.println("dont go out: "+item.getTitle()+" count:"+reasonsNotToGoOut);
+                                    reasonsNotToGoOut = 1;
+                                    button.setImageResource(R.drawable.fuckno_response);
+                                    currentDateText.setText(currentDateText.getText()+"\n"+"Scheduled Early Tmrw");
+                                    result.setText(item.getTitle());
+                                    goOut = false;
+                                    none = false;
+                                    break;
+                                }//TOMORROW IS A DAY OFF
+                                else if(item.getDayOff()) {
+                                    System.out.println("going out: "+item.getTitle()+" count: "+reasonsNotToGoOut);
+                                    reasonsNotToGoOut = -1;
+                                    button.setImageResource(R.drawable.hellyeah_response);
+                                    currentDateText.setText(currentDateText.getText() + "\n" + "Tomorrow is a holiday");
+                                    result.setText(item.getTitle());
+                                    goOut = true;
+                                    none = false;
+                                    break;
+                                } else {
+                                    System.out.println("going out: "+item.getTitle()+" count: "+reasonsNotToGoOut);
+                                    reasonsNotToGoOut = 0;
+                                    button.setImageResource(R.drawable.itsrisky_response);
+                                    currentDateText.setText(currentDateText.getText());
+                                    result.setText(item.getTitle());
+                                    goOut = true;
+                                    none = false;
+                                    break;
+                                
+                            }
+                        }
+                        if(none) {
+                            button.setImageResource(R.drawable.hellyeah_response);
+                            currentDateText.setText(currentDateText.getText()+"\n"+"Nothing to do");
+                        }
+
+
+
+
+
+
+
+
+                                        System.out.println("COUNT: "+reasonsNotToGoOut+ "GO OUT: "+goOut);
+                if(reasonsNotToGoOut == 1) {
+                    //button.setBackgroundResource(R.color.grey_dark);
+                    button.setImageResource(R.drawable.fuckno_response);
+                    //reasonsNotToGoOut = 0;
+                    goOut = true;
+                } else if(reasonsNotToGoOut == -1){
+                    //can go out
+                    //button.setBackgroundResource(R.color.blue);
+                    button.setImageResource(R.drawable.hellyeah_response);
+                    //reasonsNotToGoOut = 0;
+                } else {
+                    //button.setBackgroundResource(R.color.blue);
+                    button.setImageResource(R.drawable.itsrisky_response);
+                    //reasonsNotToGoOut = 0;
+                }
+                if(goOut) {
+                    //button.setBackgroundResource(R.color.blue);
+                    button.setImageResource(R.drawable.hellyeah_response);
+                    reasonsNotToGoOut = 0;
+                } else {
+                    //button.setBackgroundResource(R.color.grey_dark);
+                    button.setImageResource(R.drawable.fuckno_response);
+                    reasonsNotToGoOut = 0;
+                    goOut = true;
+                }

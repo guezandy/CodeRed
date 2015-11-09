@@ -35,6 +35,8 @@ public class RegisterNewAccountActivity extends Activity {
     protected TextView mRegisterAccount;
     private ParseService mParseService;
 
+    protected EditText mTooEarly;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +47,9 @@ public class RegisterNewAccountActivity extends Activity {
         mEditPassword = (EditText) findViewById(R.id.pass);
         mEditPasswordConfirm = (EditText) findViewById(R.id.comPass);
         mRegisterAccount = (TextView) findViewById(R.id.registerButton);
+
+        mTooEarly = (EditText) findViewById(R.id.early);
+
         mRegisterAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,7 +64,7 @@ public class RegisterNewAccountActivity extends Activity {
         registerDetails.add(0, mEditUsername.getText().toString());
         registerDetails.add(1, mEditPassword.getText().toString());
         registerDetails.add(2, mEditFirstName.getText().toString());
-
+        registerDetails.add(3, mTooEarly.getText().toString());
         return registerDetails;
     }
     public void registerAccount(View view) {

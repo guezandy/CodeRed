@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -79,7 +80,8 @@ public class MainActivity extends ActionBarActivity
             "Thanksgiving Day",
             "Lincoln’s Birthday",
             "Washington’s Birthday",
-            "Christmas Day"
+            "Christmas Day",
+            "Christmas Eve"
     };
 
     @Override
@@ -315,16 +317,25 @@ public class MainActivity extends ActionBarActivity
 
 
     public void syncCalendar() {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
         Context con = this.getBaseContext();
         Set<String> calendars = new HashSet<String>();
 
         Calendar startTime = Calendar.getInstance();
-        startTime.set(2015,03,01,00,00);
+        startTime.set(2015,8,01,00,00);
 
         Calendar endTime= Calendar.getInstance();
-        endTime.set(2015,05,01,00,00);
+        endTime.set(2016,1,01,00,00);
 
-        // the range is all data from 2014
+
+        /*Calendar startTime = Calendar.getInstance();
+        startTime.setTime(Calendar.getInstance().getTime());
+        startTime.add(Calendar.MONTH, 1);
+
+        Calendar endTime= Calendar.getInstance();
+        endTime.setTime(startTime.getTime());*/
 
         String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTSTART + " <= " + endTime.getTimeInMillis() + " ))";
 
@@ -380,8 +391,10 @@ public class MainActivity extends ActionBarActivity
                 event.setEndTime(getDateAndTime(Long.parseLong(cursor.getString(4))));
             }
             event.setLocation(cursor.getString(5));
-            String yes = "no";
 
+
+            //DAY OFF?
+            String yes = "no";
             if(Arrays.asList(Holidays).contains(cursor.getString(1))) {
                event.setDayOff(true);
                 yes = "YES";
@@ -395,7 +408,23 @@ public class MainActivity extends ActionBarActivity
                 event.setDayOff(false);
                 yes = "NO";
             }
-            event.setCalendarDisplay(yes+" : "+getDate(Long.parseLong(cursor.getString(3)))+" "+cursor.getString(1));
+
+            //TOO EARLY
+            Date d = new Date(Long.parseLong(cursor.getString(3)));
+            int hour = d.getHours();
+            System.out.println("USER: "+ user.getString("early") + "HOUR: "+ hour);
+
+            String e;
+            if(hour <= Integer.parseInt(user.getString("early"))) {
+                //its too early
+                event.setTooEarly(true);
+                e = "yes";
+            } else {
+                event.setTooEarly(false);
+                e = "no";
+            }
+
+            event.setCalendarDisplay("Early: "+ e+ " DO:"+yes+" : "+getDate(Long.parseLong(cursor.getString(3)))+" "+cursor.getString(1));
             event.saveInBackground();
             cursor.moveToNext();
 

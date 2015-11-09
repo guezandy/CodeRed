@@ -8,4 +8,4 @@
     android:gravity="center"
     android:textSize="12sp"
     android:paddingTop="6dp"
-    android:paddingBottom="5dp"/><!-- From: file:/Users/Luna/AndroidStudioProjects/CodeRed/caldroid/src/main/res/layout/weekday_textview.xml --><!-- From: file:/Users/Luna/AndroidStudioProjects/CodeRed/caldroid/build/intermediates/bundles/debug/res/layout/weekday_textview.xml -->
+    android:paddingBottom="5dp"/><!-- From: file:/Users/andrewrodriguez/AndroidStudioProjects/CodeRed/caldroid/src/main/res/layout/weekday_textview.xml --><!-- From: file:/Users/andrewrodriguez/AndroidStudioProjects/CodeRed/caldroid/build/intermediates/bundles/debug/res/layout/weekday_textview.xml -->

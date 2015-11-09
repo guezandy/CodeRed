@@ -23,5 +23,11 @@ public class ParseUserModel extends ParseUser {
         return this.getString("full_name");
     }
 
+    public void setEarly(String val) {
+        this.put("early", val);
+    }
 
+    public String getEarly() {
+        return this.getString("early");
+    }
 }

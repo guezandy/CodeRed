@@ -41,7 +41,6 @@ public class DrawerFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = (RelativeLayout) inflater.inflate(R.layout.fragment_drawer, container, false);
-
         return mView;
     }
 

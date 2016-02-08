@@ -1,6 +1,5 @@
 package com.lunadeveloper.codered.fragment;
 
-import android.app.Application;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -18,10 +17,9 @@ import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 
-import com.lunadeveloper.codered.CodeRedApplication;
 import com.lunadeveloper.codered.R;
 import com.lunadeveloper.codered.adapter.CustomAdapter;
-import com.lunadeveloper.codered.adapter.FriendsGoOutAdapter;
+import com.lunadeveloper.codered.adapter.NotificationsAdapter;
 import com.lunadeveloper.codered.model.ParseEventModel;
 import com.lunadeveloper.codered.service.IParseCallback;
 import com.lunadeveloper.codered.service.ParseService;
@@ -44,42 +42,38 @@ import java.util.Locale;
 import java.util.Set;
 
 
-public class ListCalendarFragment extends Fragment {
+public class NotificationsFragment extends Fragment {
     public String TAG = CalendarFragment.class.getSimpleName();
     private ParseService mParseService;
-    public CalendarView calView;
     private RelativeLayout mView;
-    public static int reasonsNotToGoOut = 0;
-    private ParseQueryAdapter<ParseObject> mainAdapter;
-    private CustomAdapter urgentTodosAdapter;
-    private ListView listView;
-    private List<ParseUser> myFriends;
+    private ListView list;
+    public Set<String> myFriends;
+    public List<ParseUser> theFriends;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        System.out.println("CREATING NOTIFICATION FRAGMENT");
         mView = (RelativeLayout) inflater.inflate(R.layout.fragment_list, container, false);
-        listView = (ListView) mView.findViewById(R.id.list);
+        list = (ListView) mView.findViewById(R.id.list);
+        theFriends = new ArrayList<ParseUser>();
 
-        myFriends = new ArrayList<ParseUser>();
-        final FriendsGoOutAdapter adapter = new FriendsGoOutAdapter(getActivity().getApplicationContext(), myFriends);
-        listView.setAdapter(adapter);
-        Application a = getActivity().getApplication();
-        System.out.println("LISTLISTLIST "+((CodeRedApplication) a).getGoOutDate());
-        ParseQuery<ParseObject> friends = ParseQuery.getQuery("friends");
-        friends.whereEqualTo("one", ParseUser.getCurrentUser());
-        friends.whereEqualTo("status", "approved");
+        final NotificationsAdapter adapter = new NotificationsAdapter(getActivity().getApplicationContext(), theFriends);
+        list.setAdapter(adapter);
 
-        friends.findInBackground(new FindCallback<ParseObject>() {
+        ParseQuery<ParseObject> friendRequests = ParseQuery.getQuery("friends");
+        friendRequests.whereEqualTo("two", ParseUser.getCurrentUser());
+        friendRequests.whereEqualTo("status", "requested");
+        friendRequests.findInBackground(new FindCallback<ParseObject>() {
             @Override
-            public void done(List<ParseObject> parseObjects, ParseException e) {
-                //all my friends
-                System.out.println("FOUND "+parseObjects.size() + " friends");
-                for(final ParseObject request : parseObjects) {
-                    System.out.println("MY FRIEND: "+ request.getObjectId());
-                    request.getParseUser("two").fetchInBackground(new GetCallback<ParseUser>() {
+            public void done(final List<ParseObject> parseObjects, ParseException e) {
+                System.out.println("FOUND this many requests: "+parseObjects.size());
+
+                for(ParseObject f : parseObjects) {
+                    f.getParseUser("one").fetchInBackground(new GetCallback<ParseUser>() {
                         @Override
-                        public void done(ParseUser friend, ParseException e) {
-                            myFriends.add(friend);
+                        public void done(ParseUser one, ParseException e) {
+                            System.out.println("ONE ONE ONE: "+ one.getUsername());
+                            theFriends.add(one);
                             adapter.notifyDataSetChanged();
                         }
                     });
@@ -87,11 +81,6 @@ public class ListCalendarFragment extends Fragment {
             }
         });
 
-        if(myFriends != null) {
-            for (ParseUser m : myFriends) {
-                System.out.println("FRIEND: " + m.getString("full_name"));
-            }
-        }
         return mView;
     }
 }

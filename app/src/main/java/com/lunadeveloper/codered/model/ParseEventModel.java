@@ -89,4 +89,19 @@ public class ParseEventModel extends ParseObject {
     public String getCalendarDisplay() {
         return this.getString("display");
     }
+
+    public void setTooEarly(Boolean b) {
+        this.put("tooEarly", b);
+    }
+
+    public Boolean getTooEarly() {
+        return this.getBoolean("tooEarly");
+    }
+
+    public void setStartHour(int h) {
+        this.put("start_hour", h);
+    }
+    public int getStartHour() {
+        return this.getInt("start_hour");
+    }
 }

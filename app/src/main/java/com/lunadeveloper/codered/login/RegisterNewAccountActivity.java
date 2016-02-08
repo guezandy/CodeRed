@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.lunadeveloper.codered.R;
@@ -33,6 +34,7 @@ public class RegisterNewAccountActivity extends Activity {
     protected EditText mEditPassword;
     protected EditText mEditPasswordConfirm;
     protected TextView mRegisterAccount;
+    protected TimePicker mEarliestTime;
     private ParseService mParseService;
 
     @Override
@@ -45,9 +47,13 @@ public class RegisterNewAccountActivity extends Activity {
         mEditPassword = (EditText) findViewById(R.id.pass);
         mEditPasswordConfirm = (EditText) findViewById(R.id.comPass);
         mRegisterAccount = (TextView) findViewById(R.id.registerButton);
+        mEarliestTime = (TimePicker) findViewById(R.id.timePicker);
+        mEarliestTime.setCurrentHour(0);
+        mEarliestTime.setCurrentMinute(0);
         mRegisterAccount.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                System.out.println("Earliest Time: "+mEarliestTime.getCurrentHour()+ " : "+mEarliestTime.getCurrentMinute());
                 registerAccount(v);
             }
         });
@@ -59,7 +65,7 @@ public class RegisterNewAccountActivity extends Activity {
         registerDetails.add(0, mEditUsername.getText().toString());
         registerDetails.add(1, mEditPassword.getText().toString());
         registerDetails.add(2, mEditFirstName.getText().toString());
-
+        registerDetails.add(3, mEarliestTime.getCurrentHour().toString());
         return registerDetails;
     }
     public void registerAccount(View view) {
@@ -81,7 +87,8 @@ public class RegisterNewAccountActivity extends Activity {
     private boolean validateFields() {
         if (mEditFirstName.getText().length() > 0
                 && mEditPassword.getText().length() > 0
-                && mEditPasswordConfirm.getText().length() > 0) {
+                && mEditPasswordConfirm.getText().length() > 0
+                && mEarliestTime.getCurrentHour() != 0) {
             return true;
         } else {
             return false;

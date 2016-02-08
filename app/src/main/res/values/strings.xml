@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">CodeRed</string>
+    <string name="app_name">Can I go out tonight?</string>
 
-    <string name="title_connected">Connect your accounts</string>
+    <string name="title_main">Can I go out?</string>
+    <string name="title_search">Search for friends</string>
     <string name="title_invite">Invite Friends</string>
     <string name="title_section3">Logout</string>
 

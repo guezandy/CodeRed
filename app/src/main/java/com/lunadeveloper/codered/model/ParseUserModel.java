@@ -2,6 +2,8 @@ package com.lunadeveloper.codered.model;
 
 import com.parse.ParseUser;
 
+import java.util.Date;
+
 /*
  * An extension of ParseUser that makes
  * it more convenient to access information
@@ -23,5 +25,20 @@ public class ParseUserModel extends ParseUser {
         return this.getString("full_name");
     }
 
+    public void setNextCalendarSync(Date date) {
+        this.put("next_sync", date);
+    }
+
+    public Date getNextCalendarSync() {
+        return this.getDate("next_sync");
+    }
+
+    public void setEarly(String i) {
+        this.put("early", i);
+    }
+
+    public int getEarly() {
+        return Integer.parseInt(this.getString("early"));
+    }
 
 }

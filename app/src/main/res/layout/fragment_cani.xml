@@ -17,7 +17,8 @@
         android:text="Current date"
         android:textColor="@color/white"
         android:textSize="50sp"
-        android:layout_above="@+id/imageView" />
+        android:layout_above="@+id/imageView"
+        android:gravity="center_vertical|center_horizontal" />
 
     <ImageView
         android:layout_width="250dp"
@@ -38,5 +39,16 @@
         android:layout_height="match_parent"
         android:src="@drawable/previous"
         android:id="@+id/prev"
-        android:layout_toLeftOf="@+id/imageView"/>
+        android:layout_toLeftOf="@+id/imageView" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@id/imageView"
+        android:text="Click button to find out"
+        android:id="@+id/message"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffffff"
+        android:paddingTop="15px" />
 </RelativeLayout>

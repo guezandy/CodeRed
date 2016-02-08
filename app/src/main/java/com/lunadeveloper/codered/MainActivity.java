@@ -18,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 
 import com.lunadeveloper.codered.fragment.CalFragment;
@@ -25,17 +26,28 @@ import com.lunadeveloper.codered.fragment.CalendarFragment;
 import com.lunadeveloper.codered.fragment.CanIGoOutFragment;
 import com.lunadeveloper.codered.fragment.DrawerFragment;
 import com.lunadeveloper.codered.fragment.ListCalendarFragment;
+import com.lunadeveloper.codered.fragment.SearchFriendsFragment;
+import com.lunadeveloper.codered.fragment.NotificationsFragment;
 import com.lunadeveloper.codered.login.ParseLoginDispatchActivity;
 import com.lunadeveloper.codered.model.ParseEventModel;
+import com.lunadeveloper.codered.model.ParseUserModel;
+import com.lunadeveloper.codered.service.IParseCallback;
+import com.lunadeveloper.codered.service.ParseService;
 import com.lunadeveloper.codered.ui.SlidingUpPanelLayout;
 import com.lunadeveloper.codered.ui.SlidingUpPanelLayout.PanelSlideListener;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -57,8 +69,9 @@ public class MainActivity extends ActionBarActivity
     /** Sliding drawer **/
     private SlidingUpPanelLayout mLayout;
 
-    /** Are we in feed or map mode **/
-    public Boolean mapMode = true;
+    /**Loading spinner **/
+    private ProgressBar spinner;
+
 
     public static ArrayList<String> nameOfEvent = new ArrayList<String>();
     public static ArrayList<String> startDates = new ArrayList<String>();
@@ -72,6 +85,7 @@ public class MainActivity extends ActionBarActivity
             "Easter Sunday",
             "Memorial Day",
             "Independence Day",
+            "Presidents' Day",
             "Labor Day",
             "Columbus Day",
             "General Election Day",
@@ -86,6 +100,13 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ParseService parseService = new ParseService(this.getBaseContext());
+        spinner = (ProgressBar) findViewById(R.id.progressBar1);
+
+        spinner.setVisibility(View.VISIBLE);
+        syncCalendar(parseService); //syncs the user calendar on login
+        spinner.setVisibility(View.GONE);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
@@ -139,8 +160,22 @@ public class MainActivity extends ActionBarActivity
                 replaceDrawerFragment(new ListCalendarFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
                 break;
             case 1:
+                Calendar c = Calendar.getInstance();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+                CodeRedApplication.setGoOutDate(dateFormat.format(c.getTime()));
+                replaceFragment(new SearchFriendsFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
+                replaceDrawerInfoFragment(new DrawerFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
+                replaceDrawerFragment(new NotificationsFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
                 break;
             case 2:
+                Calendar c2 = Calendar.getInstance();
+                SimpleDateFormat dateFormat2 = new SimpleDateFormat("MM-dd-yyyy");
+                CodeRedApplication.setGoOutDate(dateFormat2.format(c2.getTime()));
+                break;
+            case 3:
+                Calendar c3 = Calendar.getInstance();
+                SimpleDateFormat dateFormat3 = new SimpleDateFormat("MM-dd-yyyy");
+                CodeRedApplication.setGoOutDate(dateFormat3.format(c3.getTime()));
                 logout();
                 break;
             default:
@@ -151,12 +186,15 @@ public class MainActivity extends ActionBarActivity
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_connected);
+                mTitle = getString(R.string.title_main);
                 break;
             case 2:
-                mTitle = getString(R.string.title_invite);
+                mTitle = getString(R.string.title_search);
                 break;
             case 3:
+                mTitle = getString(R.string.title_invite);
+                break;
+            case 4:
                 mTitle = "Logout";
                 break;
         }
@@ -194,7 +232,8 @@ public class MainActivity extends ActionBarActivity
                 return true;
             }
             case R.id.action_sync: {
-                syncCalendar();
+                ParseService parseService = new ParseService(this.getBaseContext());
+                syncCalendar(parseService);
                 return true;
             }
         }
@@ -305,31 +344,53 @@ public class MainActivity extends ActionBarActivity
     }
 
     public static String getDate(long milliSeconds) {
-        milliSeconds = milliSeconds + 86400000;
         SimpleDateFormat formatter = new SimpleDateFormat(
-                "dd/MM/yyyy");
+                "MM-dd-yyyy");
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
     }
 
+    public static String getTime(long milliSeconds) {
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "hh:mm:ss a");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        return formatter.format(calendar.getTime());
+    }
 
-    public void syncCalendar() {
+    public static String addOneToDate(long milliSeconds) {
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "MM-dd-yyyy");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        calendar.add(Calendar.DATE, 1);
+        return formatter.format(calendar.getTime());
+    }
+
+    public static int getHour(long milliSeconds) {
+        SimpleDateFormat formatter = new SimpleDateFormat(
+                "hh");
+        SimpleDateFormat amOrPm = new SimpleDateFormat(
+                "a");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(milliSeconds);
+        String hour = formatter.format(calendar.getTime());
+        int mhour = Integer.parseInt(hour);
+        if(amOrPm.format(calendar.getTime()).equals("PM")) {
+            mhour = ((Integer.parseInt(hour) + 12)%24);
+        }
+        return mhour;
+    }
+
+    public void syncCalendar(ParseService parseService) {
         Context con = this.getBaseContext();
         Set<String> calendars = new HashSet<String>();
-
         Calendar startTime = Calendar.getInstance();
-        startTime.set(2015,03,01,00,00);
-
         Calendar endTime= Calendar.getInstance();
-        endTime.set(2015,05,01,00,00);
-
-        // the range is all data from 2014
-
-        String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTSTART + " <= " + endTime.getTimeInMillis() + " ))";
-
-
-        Cursor cursor = getContentResolver()
+        endTime.add(Calendar.MONTH, 1);
+        String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTEND + " <= " + endTime.getTimeInMillis() + " ))";
+        final Cursor cursor = getContentResolver()
                 .query(
                         Uri.parse("content://com.android.calendar/events"),
                         new String[] { "calendar_id", "title", "description",
@@ -346,12 +407,64 @@ public class MainActivity extends ActionBarActivity
         descriptions.clear();
         locations.clear();
 
-        //CNames.length
+        //TODO: delete all entries from this person
+        //Query limited to 100 entries
+        ParseQuery<ParseEventModel> deleteQuery = ParseQuery.getQuery("ParseEventModel");
+        deleteQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+        deleteQuery.findInBackground(new FindCallback<ParseEventModel>() {
+            @Override
+            public void done(List<ParseEventModel> parseEventModels, ParseException e) {
+                System.out.println("Found this many entries to delete: "+parseEventModels.size());
+                for(ParseEventModel event : parseEventModels) {
+                    event.deleteInBackground();
+                }
+            }
+        });
+
+        //TODO: Insert only these entries
         System.out.println("Number of events: "+cursor.getCount());
         System.out.println("Length: "+ CNames.length);
 
-        for (int i = 0; i < CNames.length; i++) {
-            nameOfEvent.add(cursor.getString(1));
+        for (int i = 0; i < CNames.length; i++) { //for each event
+
+            System.out.println(i+ " "+cursor.getString(1));
+            System.out.println("START HOUR: "+ getHour(Long.parseLong(cursor.getString(3))));
+            //minimum we need is a title and start time
+            if(cursor.getString(1) != null && cursor.getString(3) != null) {
+                ParseEventModel n = new ParseEventModel();
+                n.setTitle(cursor.getString(1));
+                String eStartDate = getDate(Long.parseLong(cursor.getString(3)));
+                String eStartTime = getTime(Long.parseLong(cursor.getString(3)));
+                if(eStartTime.equals("04:00:00 PM")) {
+                    eStartDate = addOneToDate(Long.parseLong(cursor.getString(3)));
+                }
+                n.setStartDate(eStartDate);
+                n.setStartTime(eStartTime);
+                n.setStartHour(getHour(Long.parseLong(cursor.getString(3))));
+                //if event is too early tomorrow
+                if(getHour(Long.parseLong(cursor.getString(3))) <= Integer.parseInt(ParseUser.getCurrentUser().getString("early"))) {
+                    n.setTooEarly(true);
+                } else {
+                    n.setTooEarly(false);
+                }
+                n.setDescription(cursor.getString(2));
+                if (cursor.getString(5) != null) {
+                    n.setLocation(cursor.getString(5));
+                }
+                //is this one of the days off?
+                if(Arrays.asList(Holidays).contains(cursor.getString(1))) {
+                    n.setDayOff(true);
+                } else {
+                    n.setDayOff(false);
+                }
+                n.setUser();
+                //n.put("hash", (cursor.getString(1) + cursor.getString(2) + Long.parseLong(cursor.getString(3))).hashCode());
+                n.saveInBackground();
+            }
+            if(!cursor.isLast())
+                cursor.moveToNext();
+
+            /*nameOfEvent.add(cursor.getString(1));
             startDates.add(getDateAndTime(Long.parseLong(cursor.getString(3))));
             if (cursor.getString(4) != null) {
                 endDates.add(getDateAndTime(Long.parseLong(cursor.getString(4))));
@@ -368,61 +481,59 @@ public class MainActivity extends ActionBarActivity
                 locations.add(cursor.getString(5));
             }
             CNames[i] = cursor.getString(1);
+            //Log.i(TAG, "CHECKING DUPLCIATE");
+            /*
+            parseService.checkDuplicates(cursor, new IParseCallback<List<ParseEventModel>>() {
+                @Override
+                public void onSuccess(List<ParseEventModel> items) {
+                    Log.i(TAG, "NOT DUPLICATE");
+                    //Not duplicate
+                    ParseEventModel event = new ParseEventModel();
+                    event.setUser();
+                    Log.i("CALLBACK: ", nameOfEvent.get(nameOfEvent.size()-1));
+                    event.setTitle(nameOfEvent.get(nameOfEvent.size()-1));
+                    event.setDescription(cursor.getString(2));
+                    event.setStartTime(getDateAndTime(Long.parseLong(cursor.getString(3))));
+                    event.setStartDate(getDate(Long.parseLong(cursor.getString(3))));
+                    if(cursor.getString(4) != null) {
+                        event.setEndTime(getDateAndTime(Long.parseLong(cursor.getString(4))));
+                    }
+                    event.setLocation(cursor.getString(5));
+                    String yes = "no";
+
+                    if(Arrays.asList(Holidays).contains(cursor.getString(1))) {
+                        event.setDayOff(true);
+                        yes = "YES";
+                    } else if(cursor.getString(1).contains("Birthday") || cursor.getString(1).contains("birthday")) {
+                        event.setDayOff(false);
+                        yes = "NO";
+                    } else if(cursor.getString(1).contains("day") || cursor.getString(1).contains("Day")) {
+                        event.setDayOff(true);
+                        yes = "YES";
+                    } else {
+                        event.setDayOff(false);
+                        yes = "NO";
+                    }
+                    event.setCalendarDisplay(yes+" : "+getDate(Long.parseLong(cursor.getString(3)))+" "+cursor.getString(1));
 
 
-            ParseEventModel event = new ParseEventModel();
-            event.setUser();
-            event.setTitle(cursor.getString(1));
-            event.setDescription(cursor.getString(2));
-            event.setStartTime(getDateAndTime(Long.parseLong(cursor.getString(3))));
-            event.setStartDate(getDate(Long.parseLong(cursor.getString(3))));
-            if(cursor.getString(4) != null) {
-                event.setEndTime(getDateAndTime(Long.parseLong(cursor.getString(4))));
-            }
-            event.setLocation(cursor.getString(5));
-            String yes = "no";
+                    event.saveInBackground();
+                }
 
-            if(Arrays.asList(Holidays).contains(cursor.getString(1))) {
-               event.setDayOff(true);
-                yes = "YES";
-            } else if(cursor.getString(1).contains("Birthday") || cursor.getString(1).contains("birthday")) {
-                event.setDayOff(false);
-                yes = "NO";
-            } else if(cursor.getString(1).contains("day") || cursor.getString(1).contains("Day")) {
-                event.setDayOff(true);
-                yes = "YES";
-            } else {
-                event.setDayOff(false);
-                yes = "NO";
-            }
-            event.setCalendarDisplay(yes+" : "+getDate(Long.parseLong(cursor.getString(3)))+" "+cursor.getString(1));
-            event.saveInBackground();
-            cursor.moveToNext();
 
+                @Override
+                public void onFail(String message) {
+                    Log.i(TAG, "GOT A DUPLICATE");
+                }
+            });
+            */
         }
-        System.out.println("Number of events: "+cursor.getCount());
+        /*System.out.println("Number of events: "+cursor.getCount());
         System.out.println("NAME: "+nameOfEvent.toString());
         System.out.println("START: "+startDates.toString());
         System.out.println("DESC: "+descriptions.toString());
-        System.out.println("LCOATION: "+locations.toString());
-    }
+        System.out.println("LOCATION: "+locations.toString());*/
 
-    public static String getDateAndTime(long milliSeconds) {
-        milliSeconds = milliSeconds + 86400000;
-        SimpleDateFormat formatter = new SimpleDateFormat(
-                "dd/MM/yyyy hh:mm:ss a");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
-    }
-
-    public static String showDate(long milliSeconds) {
-        milliSeconds = milliSeconds + 86400000;
-        SimpleDateFormat formatter = new SimpleDateFormat(
-                "dd/MM/yyyy");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
     }
 
     private void logout() {

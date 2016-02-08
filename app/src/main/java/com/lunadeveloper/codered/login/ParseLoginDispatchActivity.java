@@ -17,6 +17,7 @@ import com.lunadeveloper.codered.CodeRedApplication;
 import com.lunadeveloper.codered.MainActivity;
 import com.lunadeveloper.codered.R;
 import com.parse.LogInCallback;
+import com.parse.ParseACL;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
@@ -150,9 +151,10 @@ public class ParseLoginDispatchActivity extends Activity {
             public void done(ParseUser user, ParseException e) {
                 if (e == null) {
                     Toast.makeText(getApplicationContext(),
-                            "Welcome, " + user.getString("first_name"),
+                            "Welcome, " + user.getString("full_name"),
                             Toast.LENGTH_SHORT).show();
-                    CodeRedApplication.setUserId(user.getObjectId());
+                    //CodeRedApplication.setUserId(user.getObjectId());
+
                     Intent i = new Intent(ParseLoginDispatchActivity.this,
                             MainActivity.class);
                     startActivity(i);

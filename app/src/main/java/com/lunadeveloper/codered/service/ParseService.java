@@ -2,6 +2,7 @@ package com.lunadeveloper.codered.service;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -9,6 +10,7 @@ import com.lunadeveloper.codered.login.ParseLoginDispatchActivity;
 import com.lunadeveloper.codered.model.ParseEventModel;
 import com.lunadeveloper.codered.model.ParseUserModel;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -18,6 +20,7 @@ import com.parse.SignUpCallback;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -129,6 +132,29 @@ public class ParseService {
                 } else {
                     //add results to the callback
                     eventsCallback.onSuccess(results);
+                }
+            }
+        });
+    }
+
+    public void checkDuplicates(Cursor cursor, final IParseCallback<List<ParseEventModel>> eventsCallback) {
+        Log.i(TAG, "CHECKING DUPLICATES");
+        ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
+
+        query.whereEqualTo("title", cursor.getString(1));
+        //query.whereEqualTo("start_time", getDateAndTime(Long.parseLong(cursor.getString(3))));
+        if(cursor.getString(4) != null) {
+            query.whereEqualTo("end", getDateAndTime(Long.parseLong(cursor.getString(4))));
+        }
+        query.getFirstInBackground(new GetCallback<ParseEventModel>() {
+            @Override
+            public void done(ParseEventModel event, ParseException e) {
+                if (event != null) {
+                    Log.i(TAG, "DUPLICATES");
+                    eventsCallback.onFail("Duplicate");
+                } else {
+                    Log.i(TAG, "NOT DUPLCIATE");
+                    eventsCallback.onSuccess(new ArrayList<ParseEventModel>());
                 }
             }
         });

@@ -3,52 +3,73 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    <!--<ScrollView
+
+
+    <ScrollView
         android:id="@+id/registerScroll"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >-->
+        android:layout_height="match_parent" >
 
-    <EditText
-        android:id="@+id/fname"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Enter Fullname"
-        android:inputType="textPersonName" >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
 
-        <requestFocus />
-    </EditText>
+            <EditText
+                android:id="@+id/fname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Enter Fullname"
+                android:inputType="textPersonName" >
+            </EditText>
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/username"
-        android:layout_gravity="center_horizontal"
-        android:hint="Enter Username" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/username"
+                android:layout_gravity="center_horizontal"
+                android:hint="Enter Username" />
 
-    <EditText
-        android:id="@+id/pass"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword" />
+            <EditText
+                android:id="@+id/pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Password"
+                android:inputType="textPassword" />
 
-    <EditText
-        android:id="@+id/comPass"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Confirm Password"
-        android:inputType="textPassword" />
+            <EditText
+                android:id="@+id/comPass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="Confirm Password"
+                android:inputType="textPassword" />
 
 
-    <Button
-        android:id="@+id/registerButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:onClick="registerAccount"
-        android:text="Register" />
-    <!--</ScrollView> -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="If tomorrow you have an event before this time you wont go out tonight?"
+                android:id="@+id/textView" />
+
+            <TimePicker
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/timePicker"
+                android:foregroundGravity="center_vertical|center_horizontal"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:id="@+id/registerButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:onClick="registerAccount"
+                android:text="Register"
+                android:layout_gravity="center_horizontal" />
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>

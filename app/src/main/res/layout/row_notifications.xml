@@ -1,0 +1,36 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content" >
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:text="Full name"
+        android:layout_marginLeft="15dip"
+        android:textColor="#ffffffff" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Deny"
+        android:id="@+id/deny"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10px"
+        android:background="@color/red"
+        android:textColor="#ffffffff" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Approve"
+        android:id="@+id/approve"
+        android:background="@color/green"
+        android:layout_alignTop="@+id/deny"
+        android:layout_toLeftOf="@+id/deny"
+        android:layout_toStartOf="@+id/deny" />
+
+
+</RelativeLayout>

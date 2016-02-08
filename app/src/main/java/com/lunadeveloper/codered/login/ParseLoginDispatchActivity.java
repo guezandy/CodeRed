@@ -89,10 +89,10 @@ public class ParseLoginDispatchActivity extends Activity {
         }
 
         //TODO: remove this debugging code set to true to skip login
-        boolean debugMode = true;
+        boolean debugMode = false;
         if (debugMode) {
-            username.setText("tony");
-            password.setText("tony");
+            username.setText("demo");
+            password.setText("demo");
             loginButton.callOnClick();
         }
     }

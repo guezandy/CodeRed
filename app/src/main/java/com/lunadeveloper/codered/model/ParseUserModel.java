@@ -25,7 +25,6 @@ public class ParseUserModel extends ParseUser {
         return this.getString("full_name");
     }
 
-<<<<<<< HEAD
     public void setNextCalendarSync(Date date) {
         this.put("next_sync", date);
     }
@@ -40,13 +39,6 @@ public class ParseUserModel extends ParseUser {
 
     public int getEarly() {
         return Integer.parseInt(this.getString("early"));
-=======
-    public void setEarly(String val) {
-        this.put("early", val);
->>>>>>> origin/master
     }
 
-    public String getEarly() {
-        return this.getString("early");
-    }
 }

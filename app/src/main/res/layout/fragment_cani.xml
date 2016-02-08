@@ -6,21 +6,19 @@
     android:background="@color/background">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:id="@+id/currentDate"
         android:layout_alignParentTop="true"
-        android:gravity="center"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:text="Current date"
         android:textColor="@color/white"
-<<<<<<< HEAD
         android:textSize="50sp"
         android:layout_above="@+id/imageView"
         android:gravity="center_vertical|center_horizontal" />
-=======
-        android:textSize="12sp"
-        android:layout_above="@+id/imageView" />
->>>>>>> origin/master
 
     <ImageView
         android:layout_width="250dp"
@@ -36,23 +34,16 @@
         android:src="@drawable/next"
         android:id="@+id/next"
         android:layout_toRightOf="@+id/imageView"/>
-
     <ImageView
         android:layout_width="250dp"
         android:layout_height="match_parent"
         android:src="@drawable/previous"
         android:id="@+id/prev"
-<<<<<<< HEAD
         android:layout_toLeftOf="@+id/imageView" />
-=======
-        android:layout_toLeftOf="@+id/imageView"/>
-
->>>>>>> origin/master
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-<<<<<<< HEAD
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_below="@id/imageView"
         android:text="Click button to find out"
@@ -60,14 +51,4 @@
         android:layout_centerHorizontal="true"
         android:textColor="#ffffffff"
         android:paddingTop="15px" />
-=======
-        android:id="@+id/result"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@+id/imageView"
-        android:gravity="center"
-        android:text="The Result"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        android:layout_above="@+id/imageView" />
->>>>>>> origin/master
 </RelativeLayout>

@@ -46,6 +46,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -93,7 +94,8 @@ public class MainActivity extends ActionBarActivity
             "Thanksgiving Day",
             "Lincoln’s Birthday",
             "Washington’s Birthday",
-            "Christmas Day"
+            "Christmas Day",
+            "Christmas Eve"
     };
 
     @Override
@@ -383,14 +385,41 @@ public class MainActivity extends ActionBarActivity
         return mhour;
     }
 
+<<<<<<< HEAD
     public void syncCalendar(ParseService parseService) {
+=======
+    public void syncCalendar() {
+
+        ParseUser user = ParseUser.getCurrentUser();
+
+>>>>>>> origin/master
         Context con = this.getBaseContext();
         Set<String> calendars = new HashSet<String>();
         Calendar startTime = Calendar.getInstance();
+<<<<<<< HEAD
         Calendar endTime= Calendar.getInstance();
         endTime.add(Calendar.MONTH, 1);
         String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTEND + " <= " + endTime.getTimeInMillis() + " ))";
         final Cursor cursor = getContentResolver()
+=======
+        startTime.set(2015,8,01,00,00);
+
+        Calendar endTime= Calendar.getInstance();
+        endTime.set(2016,1,01,00,00);
+
+
+        /*Calendar startTime = Calendar.getInstance();
+        startTime.setTime(Calendar.getInstance().getTime());
+        startTime.add(Calendar.MONTH, 1);
+
+        Calendar endTime= Calendar.getInstance();
+        endTime.setTime(startTime.getTime());*/
+
+        String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTSTART + " <= " + endTime.getTimeInMillis() + " ))";
+
+
+        Cursor cursor = getContentResolver()
+>>>>>>> origin/master
                 .query(
                         Uri.parse("content://com.android.calendar/events"),
                         new String[] { "calendar_id", "title", "description",
@@ -481,6 +510,7 @@ public class MainActivity extends ActionBarActivity
                 locations.add(cursor.getString(5));
             }
             CNames[i] = cursor.getString(1);
+<<<<<<< HEAD
             //Log.i(TAG, "CHECKING DUPLCIATE");
             /*
             parseService.checkDuplicates(cursor, new IParseCallback<List<ParseEventModel>>() {
@@ -527,6 +557,57 @@ public class MainActivity extends ActionBarActivity
                 }
             });
             */
+=======
+
+
+            ParseEventModel event = new ParseEventModel();
+            event.setUser();
+            event.setTitle(cursor.getString(1));
+            event.setDescription(cursor.getString(2));
+            event.setStartTime(getDateAndTime(Long.parseLong(cursor.getString(3))));
+            event.setStartDate(getDate(Long.parseLong(cursor.getString(3))));
+            if(cursor.getString(4) != null) {
+                event.setEndTime(getDateAndTime(Long.parseLong(cursor.getString(4))));
+            }
+            event.setLocation(cursor.getString(5));
+
+
+            //DAY OFF?
+            String yes = "no";
+            if(Arrays.asList(Holidays).contains(cursor.getString(1))) {
+               event.setDayOff(true);
+                yes = "YES";
+            } else if(cursor.getString(1).contains("Birthday") || cursor.getString(1).contains("birthday")) {
+                event.setDayOff(false);
+                yes = "NO";
+            } else if(cursor.getString(1).contains("day") || cursor.getString(1).contains("Day")) {
+                event.setDayOff(true);
+                yes = "YES";
+            } else {
+                event.setDayOff(false);
+                yes = "NO";
+            }
+
+            //TOO EARLY
+            Date d = new Date(Long.parseLong(cursor.getString(3)));
+            int hour = d.getHours();
+            System.out.println("USER: "+ user.getString("early") + "HOUR: "+ hour);
+
+            String e;
+            if(hour <= Integer.parseInt(user.getString("early"))) {
+                //its too early
+                event.setTooEarly(true);
+                e = "yes";
+            } else {
+                event.setTooEarly(false);
+                e = "no";
+            }
+
+            event.setCalendarDisplay("Early: "+ e+ " DO:"+yes+" : "+getDate(Long.parseLong(cursor.getString(3)))+" "+cursor.getString(1));
+            event.saveInBackground();
+            cursor.moveToNext();
+
+>>>>>>> origin/master
         }
         /*System.out.println("Number of events: "+cursor.getCount());
         System.out.println("NAME: "+nameOfEvent.toString());

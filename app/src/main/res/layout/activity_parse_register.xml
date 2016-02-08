@@ -48,6 +48,7 @@
                 android:inputType="textPassword" />
 
 
+<<<<<<< HEAD
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -72,4 +73,29 @@
                 android:layout_gravity="center_horizontal" />
         </LinearLayout>
     </ScrollView>
+=======
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="How early would an event be tomorrow for you to not consider going out at all?"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Military time please"
+        android:inputType="number"
+        android:ems="10"
+        android:id="@+id/early" />
+
+
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:onClick="registerAccount"
+        android:text="Register" />
+    <!--</ScrollView> -->
+>>>>>>> origin/master
 </LinearLayout>

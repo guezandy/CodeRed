@@ -1,6 +1,7 @@
 package com.lunadeveloper.codered;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -105,7 +106,12 @@ public class MainActivity extends ActionBarActivity
         spinner = (ProgressBar) findViewById(R.id.progressBar1);
 
         spinner.setVisibility(View.VISIBLE);
-        syncCalendar(parseService); //syncs the user calendar on login
+        ParseUserModel user = (ParseUserModel) ParseUser.getCurrentUser();
+        if(user.getCalendarSync())
+            syncCalendar(parseService); //syncs the user calendar on login
+        //TODO
+        //if(user.getContactSync())
+        //    syncContact();
         spinner.setVisibility(View.GONE);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -150,12 +156,39 @@ public class MainActivity extends ActionBarActivity
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        System.out.println("CALLING ON STOP");
+        Application a = getApplication();
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("MM-dd-yyyy");
+        ((CodeRedApplication) a).setGoOutDate(df.format(c.getTime()));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        System.out.println("CALLING ON RESUME");
+        Bundle args = new Bundle();
+        args.putInt("key", 0);
+        CanIGoOutFragment newScreen = new CanIGoOutFragment();
+        newScreen.setArguments(args);
+        replaceFragment(newScreen, true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
+        replaceDrawerInfoFragment(new DrawerFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
+        replaceDrawerFragment(new ListCalendarFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
+    }
+
+    @Override
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         switch(position) {
             case 0:
                 //ON START
-                replaceFragment(new CanIGoOutFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
+                Bundle args = new Bundle();
+                args.putInt("key", 0);
+                CanIGoOutFragment newScreen = new CanIGoOutFragment();
+                newScreen.setArguments(args);
+                replaceFragment(newScreen, true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
                 replaceDrawerInfoFragment(new DrawerFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
                 replaceDrawerFragment(new ListCalendarFragment(), true, FragmentTransaction.TRANSIT_FRAGMENT_FADE, getString(R.string.title_section3));
                 break;
@@ -173,6 +206,10 @@ public class MainActivity extends ActionBarActivity
                 CodeRedApplication.setGoOutDate(dateFormat2.format(c2.getTime()));
                 break;
             case 3:
+                Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(i);
+                break;
+            case 4:
                 Calendar c3 = Calendar.getInstance();
                 SimpleDateFormat dateFormat3 = new SimpleDateFormat("MM-dd-yyyy");
                 CodeRedApplication.setGoOutDate(dateFormat3.format(c3.getTime()));
@@ -384,11 +421,14 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void syncCalendar(ParseService parseService) {
+
         Context con = this.getBaseContext();
         Set<String> calendars = new HashSet<String>();
         Calendar startTime = Calendar.getInstance();
         Calendar endTime= Calendar.getInstance();
         endTime.add(Calendar.MONTH, 1);
+        //get all events a month and 2 days in advance just in case. users can check up to a month ahead so 2 day buffer
+        endTime.add(Calendar.DATE, 2);
         String selection = "(( " + CalendarContract.Events.DTSTART + " >= " + startTime.getTimeInMillis() + " ) AND ( " + CalendarContract.Events.DTEND + " <= " + endTime.getTimeInMillis() + " ))";
         final Cursor cursor = getContentResolver()
                 .query(
@@ -426,7 +466,6 @@ public class MainActivity extends ActionBarActivity
         System.out.println("Length: "+ CNames.length);
 
         for (int i = 0; i < CNames.length; i++) { //for each event
-
             System.out.println(i+ " "+cursor.getString(1));
             System.out.println("START HOUR: "+ getHour(Long.parseLong(cursor.getString(3))));
             //minimum we need is a title and start time
@@ -447,7 +486,9 @@ public class MainActivity extends ActionBarActivity
                 } else {
                     n.setTooEarly(false);
                 }
-                n.setDescription(cursor.getString(2));
+                if(cursor.getString(2) != null) {
+                    n.setDescription(cursor.getString(2));
+                }
                 if (cursor.getString(5) != null) {
                     n.setLocation(cursor.getString(5));
                 }
@@ -463,83 +504,12 @@ public class MainActivity extends ActionBarActivity
             }
             if(!cursor.isLast())
                 cursor.moveToNext();
-
-            /*nameOfEvent.add(cursor.getString(1));
-            startDates.add(getDateAndTime(Long.parseLong(cursor.getString(3))));
-            if (cursor.getString(4) != null) {
-                endDates.add(getDateAndTime(Long.parseLong(cursor.getString(4))));
-            }
-            descriptions.add(cursor.getString(2));
-            if(cursor.getString(2).equals("")) {
-                System.out.println("no space");
-            }
-            if(cursor.getString(1).equals("Easter Sunday")) {
-                System.out.println("ITS EASTER");
-            }
-
-            if (cursor.getString(5) != null) {
-                locations.add(cursor.getString(5));
-            }
-            CNames[i] = cursor.getString(1);
-            //Log.i(TAG, "CHECKING DUPLCIATE");
-            /*
-            parseService.checkDuplicates(cursor, new IParseCallback<List<ParseEventModel>>() {
-                @Override
-                public void onSuccess(List<ParseEventModel> items) {
-                    Log.i(TAG, "NOT DUPLICATE");
-                    //Not duplicate
-                    ParseEventModel event = new ParseEventModel();
-                    event.setUser();
-                    Log.i("CALLBACK: ", nameOfEvent.get(nameOfEvent.size()-1));
-                    event.setTitle(nameOfEvent.get(nameOfEvent.size()-1));
-                    event.setDescription(cursor.getString(2));
-                    event.setStartTime(getDateAndTime(Long.parseLong(cursor.getString(3))));
-                    event.setStartDate(getDate(Long.parseLong(cursor.getString(3))));
-                    if(cursor.getString(4) != null) {
-                        event.setEndTime(getDateAndTime(Long.parseLong(cursor.getString(4))));
-                    }
-                    event.setLocation(cursor.getString(5));
-                    String yes = "no";
-
-                    if(Arrays.asList(Holidays).contains(cursor.getString(1))) {
-                        event.setDayOff(true);
-                        yes = "YES";
-                    } else if(cursor.getString(1).contains("Birthday") || cursor.getString(1).contains("birthday")) {
-                        event.setDayOff(false);
-                        yes = "NO";
-                    } else if(cursor.getString(1).contains("day") || cursor.getString(1).contains("Day")) {
-                        event.setDayOff(true);
-                        yes = "YES";
-                    } else {
-                        event.setDayOff(false);
-                        yes = "NO";
-                    }
-                    event.setCalendarDisplay(yes+" : "+getDate(Long.parseLong(cursor.getString(3)))+" "+cursor.getString(1));
-
-
-                    event.saveInBackground();
-                }
-
-
-                @Override
-                public void onFail(String message) {
-                    Log.i(TAG, "GOT A DUPLICATE");
-                }
-            });
-            */
         }
-        /*System.out.println("Number of events: "+cursor.getCount());
-        System.out.println("NAME: "+nameOfEvent.toString());
-        System.out.println("START: "+startDates.toString());
-        System.out.println("DESC: "+descriptions.toString());
-        System.out.println("LOCATION: "+locations.toString());*/
-
     }
 
     private void logout() {
         // Log the user out
         ParseUser.logOut();
-
         // Go to the login view
         startLoginActivity();
     }

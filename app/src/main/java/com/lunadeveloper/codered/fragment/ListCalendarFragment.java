@@ -63,6 +63,7 @@ public class ListCalendarFragment extends Fragment {
         myFriends = new ArrayList<ParseUser>();
         final FriendsGoOutAdapter adapter = new FriendsGoOutAdapter(getActivity().getApplicationContext(), myFriends);
         listView.setAdapter(adapter);
+        listView.setEmptyView(mView.findViewById(android.R.id.empty));
         Application a = getActivity().getApplication();
         System.out.println("LISTLISTLIST "+((CodeRedApplication) a).getGoOutDate());
         ParseQuery<ParseObject> friends = ParseQuery.getQuery("friends");

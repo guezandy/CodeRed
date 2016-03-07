@@ -2,6 +2,12 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
+    <TextView android:id="@android:id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:text="Hey you got no friends yet, this space will show you which of your friends can go out with you."/>
+
     <ListView
         android:id="@+id/list"
         android:layout_width="fill_parent"

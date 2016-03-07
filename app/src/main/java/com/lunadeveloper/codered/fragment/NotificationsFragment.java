@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.CalendarView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.lunadeveloper.codered.R;
 import com.lunadeveloper.codered.adapter.CustomAdapter;
@@ -58,6 +59,9 @@ public class NotificationsFragment extends Fragment {
         theFriends = new ArrayList<ParseUser>();
 
         final NotificationsAdapter adapter = new NotificationsAdapter(getActivity().getApplicationContext(), theFriends);
+        TextView emptyText = (TextView) mView.findViewById(android.R.id.empty);
+        emptyText.setText("You got no new friend requests");
+        list.setEmptyView(mView.findViewById(android.R.id.empty));
         list.setAdapter(adapter);
 
         ParseQuery<ParseObject> friendRequests = ParseQuery.getQuery("friends");

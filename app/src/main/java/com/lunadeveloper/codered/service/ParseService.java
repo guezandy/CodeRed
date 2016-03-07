@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.lunadeveloper.codered.login.ParseLoginDispatchActivity;
 import com.lunadeveloper.codered.model.ParseEventModel;
 import com.lunadeveloper.codered.model.ParseUserModel;
+import com.lunadeveloper.codered.model.ResultModel;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -36,19 +37,12 @@ import java.util.Locale;
  */
 public class ParseService {
     private final String TAG = ParseService.class.getSimpleName();
-
-
-    static int counter = 1;
     private Context context;
-
-    NumberFormat nf = NumberFormat.getCurrencyInstance();
-
-    public boolean APPDEBUG = false;
-
     public ParseService(Context context) {
         this.context = context;
     }
-
+    public String CAN_I_GO_OUT_MESSAGE;
+    public int CAN_I_GO_OUT;
 
     public void registerNewUser(final Context context, List<String> registerDetails) {
         final ParseUserModel user = new ParseUserModel();
@@ -56,6 +50,7 @@ public class ParseService {
         user.setUsername(registerDetails.get(0));
         user.setPassword(registerDetails.get(1));
         user.setFullName(registerDetails.get(2));
+        user.setEarly(registerDetails.get(3));
 
         user.signUpInBackground(new SignUpCallback() {
             @Override
@@ -80,120 +75,50 @@ public class ParseService {
         });
     }
 
-    /*public void getVideoPerUser(final Context context, final IParseCallback<List<ParseVideoModel>> itemsCallback) {
-
-        ParseQuery<ParseVideoModel> query = ParseQuery.getQuery("ParseVideoModel");
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
-        //query.whereEqualTo("store", store);
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<ParseVideoModel>() {
+    public void checkGoOut(ParseUser pu, String tomorrowsDate, final IParseResultCallback resultsCallback) {
+        ParseQuery<ParseEventModel> tomorrowsEvents = ParseQuery.getQuery("ParseEventModel");
+        tomorrowsEvents.whereEqualTo("start_date", tomorrowsDate);
+        tomorrowsEvents.whereEqualTo("user", pu);
+        tomorrowsEvents.findInBackground(new FindCallback<ParseEventModel>() {
             @Override
-            public void done(List<ParseVideoModel> results, ParseException e) {
-                if (e != null) {
-                    // There was an error
+            public void done(List<ParseEventModel> parseEventModels, ParseException e) {
+                if(e != null)
+                    resultsCallback.onFail(e.getMessage());
+
+                System.out.println(parseEventModels.size() + " events tomorrow");
+                //no events tomorrow
+                if(parseEventModels.size() == 0) {
+                    CAN_I_GO_OUT = 0;
+                    CAN_I_GO_OUT_MESSAGE = "NO EVENTS TOMORROW!";
                 } else {
-                    //add results to the callback
-                    itemsCallback.onSuccess(results);
+                    boolean event_too_early = false;
+                    boolean tomorrow_day_off = false;
+                    int earliest_event_tomorrow = 25;
+                    for(ParseEventModel event : parseEventModels) {
+                        //tomorrows a holiday
+                        if(event.getDayOff()) {
+                            tomorrow_day_off = true;
+                            CAN_I_GO_OUT_MESSAGE = "Tomorrow is a holiday";
+                            CAN_I_GO_OUT = 0;
+                            break;
+                        }
+                        if(event.getTooEarly()) {
+                            //got soemthign early tomorrow
+                            CAN_I_GO_OUT = 1; //NO
+                            CAN_I_GO_OUT_MESSAGE = "You got: "+ event.getTitle() + " at "+ event.getStartHour();
+                            break;
+                        }
+                        //store the earliest event to show the user their earliest event tomorrow
+                        if(earliest_event_tomorrow > event.getStartHour()) {
+                            earliest_event_tomorrow = event.getStartHour();
+                            CAN_I_GO_OUT_MESSAGE = "Earliest event tomorrow is: "+ event.getTitle() + " at "+ event.getStartHour()%12 + ((event.getStartHour() > 12) ? "PM" : "AM");
+                            CAN_I_GO_OUT = 0;
+                        }
+                    }
                 }
+                ResultModel res = new ResultModel(CAN_I_GO_OUT, CAN_I_GO_OUT_MESSAGE);
+                resultsCallback.onSuccess(res);
             }
         });
-
-    }
-
-    public void getVideoPerAudience(final Context context, final String audienceId, final IParseCallback<List<ParseVideoModel>> itemsCallback) {
-
-        ParseQuery<ParseVideoModel> query = ParseQuery.getQuery("ParseVideoModel");
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
-        //query.whereEqualTo("store", store);
-        query.orderByDescending("createdAt");
-        query.findInBackground(new FindCallback<ParseVideoModel>() {
-            @Override
-            public void done(List<ParseVideoModel> results, ParseException e) {
-                if (e != null) {
-                    // There was an error
-                } else {
-                    //add results to the callback
-                    itemsCallback.onSuccess(results);
-                }
-            }
-        });
-
-    }*/
-
-    public void getEvents(final IParseCallback<List<ParseEventModel>> eventsCallback) {
-
-        ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
-        query.findInBackground(new FindCallback<ParseEventModel>() {
-            @Override
-            public void done(List<ParseEventModel> results, ParseException e) {
-                if (e != null) {
-                    // There was an error
-                } else {
-                    //add results to the callback
-                    eventsCallback.onSuccess(results);
-                }
-            }
-        });
-    }
-
-    public void checkDuplicates(Cursor cursor, final IParseCallback<List<ParseEventModel>> eventsCallback) {
-        Log.i(TAG, "CHECKING DUPLICATES");
-        ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
-
-        query.whereEqualTo("title", cursor.getString(1));
-        //query.whereEqualTo("start_time", getDateAndTime(Long.parseLong(cursor.getString(3))));
-        if(cursor.getString(4) != null) {
-            query.whereEqualTo("end", getDateAndTime(Long.parseLong(cursor.getString(4))));
-        }
-        query.getFirstInBackground(new GetCallback<ParseEventModel>() {
-            @Override
-            public void done(ParseEventModel event, ParseException e) {
-                if (event != null) {
-                    Log.i(TAG, "DUPLICATES");
-                    eventsCallback.onFail("Duplicate");
-                } else {
-                    Log.i(TAG, "NOT DUPLCIATE");
-                    eventsCallback.onSuccess(new ArrayList<ParseEventModel>());
-                }
-            }
-        });
-    }
-
-    public void checkDate(final String string, final IParseCallback<List<ParseEventModel>> eventsCallback) {
-
-        //String string = "January 2, 2010";
-        DateFormat format = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
-        Date date = null;
-        try {
-            date = format.parse(string);
-        } catch (java.text.ParseException i) {
-            Log.e("GET TOMORROW", "GOT EXCEPTION");
-        }
-        System.out.println(date); // Sat Jan 02 00:00:00 GMT 2010
-
-
-        ParseQuery<ParseEventModel> query = ParseQuery.getQuery("ParseEventModel");
-        query.whereEqualTo("user", ParseUser.getCurrentUser());
-        query.whereEqualTo("start_date", string);
-        query.findInBackground(new FindCallback<ParseEventModel>() {
-            @Override
-            public void done(List<ParseEventModel> results, ParseException e) {
-                if (e != null) {
-                    // There was an error
-                } else {
-                    //add results to the callback
-                    eventsCallback.onSuccess(results);
-                }
-            }
-        });
-    }
-
-    public static String getDateAndTime(long milliSeconds) {
-        SimpleDateFormat formatter = new SimpleDateFormat(
-                "dd/MM/yyyy hh:mm:ss a");
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(milliSeconds);
-        return formatter.format(calendar.getTime());
     }
 }

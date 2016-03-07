@@ -3,6 +3,7 @@ package com.lunadeveloper.codered.adapter;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,9 @@ import android.widget.Toast;
 import com.lunadeveloper.codered.CodeRedApplication;
 import com.lunadeveloper.codered.R;
 import com.lunadeveloper.codered.model.ParseEventModel;
+import com.lunadeveloper.codered.model.ResultModel;
+import com.lunadeveloper.codered.service.IParseResultCallback;
+import com.lunadeveloper.codered.service.ParseService;
 import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -33,11 +37,11 @@ import java.util.Set;
 
 
 public class FriendsGoOutAdapter extends ArrayAdapter<ParseUser> {
+    public String TAG = FriendsGoOutAdapter.class.getSimpleName();
 
     public ParseUser requester;
     public Date date;
-    public static int CAN_I_GO_OUT;
-    public static String CAN_I_GO_OUT_MESSAGE;
+    public ParseService mParseService;
 
     public FriendsGoOutAdapter(Context context, List<ParseUser> requests) {
         super(context, 0, requests);
@@ -46,10 +50,9 @@ public class FriendsGoOutAdapter extends ArrayAdapter<ParseUser> {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        CAN_I_GO_OUT = -1;
-
         // Get the data item for this position
         final ParseUser user = getItem(position);
+        mParseService = new ParseService(getContext());
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
@@ -76,63 +79,36 @@ public class FriendsGoOutAdapter extends ArrayAdapter<ParseUser> {
         String tomorrowsDate = dateFormat.format(checkDate.getTime());
         System.out.println("FRIENDS CHECK  DATE IS: "+ tomorrowsDate);
 
-        ParseQuery<ParseEventModel> tomorrowsEvents = ParseQuery.getQuery("ParseEventModel");
-        tomorrowsEvents.whereEqualTo("user", user);
-        tomorrowsEvents.whereEqualTo("start_date", tomorrowsDate);
-        tomorrowsEvents.findInBackground(new FindCallback<ParseEventModel>() {
+        if(user == null) {
+            System.out.println("USER IS NULL FOR this one");
+        } else {
+            System.out.println("USER IS NOT NULL");
+        }
+
+        mParseService.checkGoOut(user, tomorrowsDate, new IParseResultCallback() {
             @Override
-            public void done(List<ParseEventModel> parseEventModels, ParseException e) {
-                System.out.println("FRIEND HAS: "+parseEventModels.size() + " events tomorrow");
-                //no events tomorrow
-                if (parseEventModels.size() == 0) {
-                    CAN_I_GO_OUT = 0;
-                    CAN_I_GO_OUT_MESSAGE = "NO EVENTS TOMORROW!";
+            public void onSuccess(ResultModel result) {
+                System.out.println("FRIEND CAN I GO OUT: "+ result.getStatus()+ " "+result.getMessage());
+                if(result.getStatus() == 0) {
+                    canI.setText("YES");
+                    canI.setBackgroundResource(R.color.green);
+                } else if(result.getStatus() == 1) {
+                    canI.setText("NO");
+                    canI.setBackgroundResource(R.color.red);
+                    canI.setEnabled(false);
                 } else {
-                    boolean event_too_early = false;
-                    boolean tomorrow_day_off = false;
-                    int earliest_event_tomorrow = 25;
-                    for (ParseEventModel event : parseEventModels) {
-                        //tomorrows a holiday
-                        if (event.getDayOff()) {
-                            tomorrow_day_off = true;
-                            CAN_I_GO_OUT_MESSAGE = "Tomorrow is a holiday";
-                            CAN_I_GO_OUT = 0;
-                            break;
-                        }
-                        if (event.getTooEarly()) {
-                            //got soemthign early tomorrow
-                            CAN_I_GO_OUT = 1; //NO
-                            CAN_I_GO_OUT_MESSAGE = "You got: " + event.getTitle() + " at " + event.getStartHour() + ((event.getStartHour() > 12) ? "PM" : "AM");
-                            break;
-                        }
-                        //store the earliest event to show the user their earliest event tomorrow
-                        if (earliest_event_tomorrow > event.getStartHour()) {
-                            earliest_event_tomorrow = event.getStartHour();
-                            CAN_I_GO_OUT_MESSAGE = "Earliest event tomorrow is: " + event.getTitle() + " at " + event.getStartHour() % 12 + ((event.getStartHour() > 12) ? "PM" : "AM");
-                            CAN_I_GO_OUT = 0;
-                        }
-                    }
+                    canI.setText("YES");
+                    canI.setEnabled(true);
+                    canI.setBackgroundResource(R.color.green);
                 }
             }
-        });
-        notifyDataSetChanged();
 
-        System.out.println("FRIEND CAN I GO OUT: "+ CAN_I_GO_OUT+ " "+CAN_I_GO_OUT_MESSAGE);
-        if(CAN_I_GO_OUT == 0) {
-            canI.setText("YES");
-            canI.setBackgroundResource(R.color.green);
-            //message.setText(CAN_I_GO_OUT_MESSAGE);
-        } else if(CAN_I_GO_OUT == 1) {
-            canI.setText("NO");
-            canI.setBackgroundResource(R.color.red);
-            canI.setEnabled(false);
-            //message.setText(CAN_I_GO_OUT_MESSAGE);
-        } else {
-            canI.setText("YES");
-            canI.setEnabled(true);
-            canI.setBackgroundResource(R.color.green);
-        }
-        notifyDataSetChanged();
+            @Override
+            public void onFail(String message) {
+                Log.e(TAG, message);
+            }
+        });
+        //notifyDataSetChanged();
         return convertView;
     }
 }

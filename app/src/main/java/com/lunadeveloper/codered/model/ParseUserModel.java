@@ -1,5 +1,6 @@
 package com.lunadeveloper.codered.model;
 
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.util.Date;
@@ -14,7 +15,15 @@ public class ParseUserModel extends ParseUser {
     private final String TAG = ParseUserModel.class.getSimpleName();
 
     public ParseUserModel() {
-        //required default constructer
+
+    }
+
+    public ParseUserModel(String v) {
+        //TODO fix legacy go out algorithm dependency on tooearly variable
+        setEarly("8");
+
+        setCalendarSync(false);
+        setCalendarSync(false);
     }
 
     public void setFullName(String fname) {
@@ -39,6 +48,38 @@ public class ParseUserModel extends ParseUser {
 
     public int getEarly() {
         return Integer.parseInt(this.getString("early"));
+    }
+
+    public ParseFile getImage() {
+        return this.getParseFile("image");
+    }
+
+    public void setImage(ParseFile f) {
+        this.put("image", f);
+    }
+
+    public String getPhone() {
+        return this.getString("phone");
+    }
+
+    public void setPhone(String p) {
+        this.put("phone", p);
+    }
+
+    public Boolean getCalendarSync() {
+        return this.getBoolean("calendar_sync");
+    }
+
+    public void setCalendarSync(Boolean sync) {
+        this.put("calendar_sync", sync);
+    }
+
+    public Boolean getContactSync() {
+        return this.getBoolean("contact_sync");
+    }
+
+    public void setContactSync(Boolean sync) {
+        this.put("contact_sync", sync);
     }
 
 }

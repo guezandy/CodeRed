@@ -13,6 +13,8 @@ import android.util.Log;
 
 import com.lunadeveloper.codered.model.ParseEventModel;
 import com.lunadeveloper.codered.model.ParseUserModel;
+import com.lunadeveloper.codered.model.ScheduleModel;
+import com.lunadeveloper.codered.model.UserEventModel;
 import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseACL;
@@ -41,16 +43,12 @@ public class CodeRedApplication extends Application {
     // Debugging tag for the application
     public static final String APPTAG = "CodeRed";
 
-    public ParseUser user;
-    private static final String KEY_PARSE_USER = "user";
-
-    // Key for saving the search distance preference
-    private static final String KEY_SEARCH_DISTANCE = "searchDistance";
-
     // Key for saving the search distance preference
     private static final String KEY_GO_OUT_DATE = "searchDate";
 
     private static SharedPreferences preferences;
+
+
 
 
     @Override
@@ -64,6 +62,9 @@ public class CodeRedApplication extends Application {
          */
         ParseObject.registerSubclass(ParseUserModel.class);
         ParseObject.registerSubclass(ParseEventModel.class);
+        ParseObject.registerSubclass(ScheduleModel.class);
+        //ParseObject.registerSubclass(UserEventModel.class);
+
 
 
         preferences = getSharedPreferences("com.lunadeveloper.codered", Context.MODE_PRIVATE);
@@ -111,44 +112,13 @@ public class CodeRedApplication extends Application {
 
     }
 
-    public static void setUserId(String userId) {
-        preferences.edit().putString(KEY_PARSE_USER, userId).commit();
-    }
-
-    public static ParseUser getUser() {
-        final String userId = preferences.getString(KEY_PARSE_USER, "");
-
-        ParseQuery<ParseUser> query = ParseUser.getQuery();
-        query.getInBackground(userId, new GetCallback<ParseUser>(){
-            @Override
-            public void done(ParseUser user, ParseException e) {
-                if(user != null) {
-                    Log.i(TAG, "We got the user in the application class");
-                    Log.i(TAG, user.getString("first_name"));
-                    //theUser = user;
-                }
-                else {
-                    Log.i(TAG, "We didnt get the user in the class");
-                }
-            }
-        });
-        return ParseUser.getCurrentUser();
-
-    }
-
-    public static float getSearchDistance() {
-        return preferences.getFloat(KEY_SEARCH_DISTANCE, 250);
-    }
-
-    public static void setSearchDistance(float value) {
-        preferences.edit().putFloat(KEY_SEARCH_DISTANCE, value).commit();
-    }
 
     public static void setGoOutDate(String s) {
         preferences.edit().putString(KEY_GO_OUT_DATE, s).commit();
     }
 
     public static String getGoOutDate() {
+
         final SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
         final Calendar c = Calendar.getInstance();
         return preferences.getString(KEY_GO_OUT_DATE, dateFormat.format(c.getTime()));

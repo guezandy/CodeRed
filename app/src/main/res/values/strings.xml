@@ -25,5 +25,13 @@
     <string name="customize">Customize</string>
     <string name="show_dialog">Show Dialog</string>
     <string name="undo">Undo</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_launch">LaunchActivity</string>
+    <string name="title_activity_registration">RegistrationActivity</string>
+
+    <string name="dialog_fire_missiles">Fire de missles</string>
+    <string name="fire">Add</string>
+    <string name="cancel">Cancel</string>
 </resources>

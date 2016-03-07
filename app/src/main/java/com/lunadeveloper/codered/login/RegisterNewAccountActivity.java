@@ -3,10 +3,14 @@ package com.lunadeveloper.codered.login;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -14,9 +18,13 @@ import android.widget.Toast;
 import com.lunadeveloper.codered.R;
 import com.lunadeveloper.codered.service.ParseService;
 import com.parse.ParseException;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import java.io.IOException;
+import java.nio.BufferUnderflowException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +79,6 @@ public class RegisterNewAccountActivity extends Activity {
     public void registerAccount(View view) {
         if (validateFields()) {
             if (validatePasswordMatch()) {
-                //processSignup(view);
                 mParseService = new ParseService(view.getContext());
                 mParseService.registerNewUser(view.getContext(), getUserInformation());
             } else {

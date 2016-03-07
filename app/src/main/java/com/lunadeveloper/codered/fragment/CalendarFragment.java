@@ -43,7 +43,7 @@ public class CalendarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mView = (RelativeLayout) inflater.inflate(R.layout.fragment_calendar, container, false);
         calView = (CalendarView) mView.findViewById(R.id.calendarView);
-
+/*
         mParseService = new ParseService(mView.getContext());
 //test ten days
         new ParseService(mView.getContext()).getEvents(new IParseCallback<List<ParseEventModel>>() {
@@ -76,6 +76,7 @@ public class CalendarFragment extends Fragment {
 
             }
         });
+        */
         return mView;
     }
 
